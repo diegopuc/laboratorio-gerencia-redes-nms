@@ -1,0 +1,66 @@
+name: laboratorio-librenms
+x-nms: &nms
+  image: ${LIBRENMS_IMAGE:-librenms/librenms:latest}
+  cap_add: [NET_ADMIN, NET_RAW]
+  env_file: librenms.env
+  volumes: [nms:/data]
+  depends_on:
+    db: {condition: service_healthy}
+    redis: {condition: service_started}
+  restart: unless-stopped
+x-device: &device
+  build: ./dispositivos
+  image: gr-dispositivo:local
+  cap_add: [NET_ADMIN, NET_RAW]
+  mem_limit: 256m
+  cpus: 1.0
+  restart: unless-stopped
+services:
+  db:
+    image: mariadb:12
+    command: [mariadbd, --innodb-file-per-table=1, --lower-case-table-names=0, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: 'yes'
+      MARIADB_DATABASE: librenms
+      MARIADB_USER: librenms
+      MARIADB_PASSWORD: lab-db-local
+    volumes: [db:/var/lib/mysql]
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  redis:
+    image: redis:7.2-alpine
+  librenms:
+    <<: *nms
+    hostname: librenms
+    ports: ['127.0.0.1:8000:8000']
+  dispatcher:
+    <<: *nms
+    hostname: dispatcher
+    environment:
+      SIDECAR_DISPATCHER: '1'
+      DISPATCHER_NODE_ID: dispatcher1
+    depends_on: [librenms, redis]
+  syslog:
+    <<: *nms
+    hostname: syslog
+    environment:
+      SIDECAR_SYSLOGNG: '1'
+    depends_on: [librenms, redis]
+  servidor1:
+    <<: *device
+    hostname: servidor1
+  servidor2:
+    <<: *device
+    hostname: servidor2
+  firewall:
+    <<: *device
+    hostname: firewall
+volumes:
+  db:
+  nms:
+networks:
+  default:
+    driver: bridge
