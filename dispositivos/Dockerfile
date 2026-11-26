@@ -12,10 +12,12 @@ RUN apk add --no-cache \
     iputils \
     nginx \
     procps \
-    tcpdump
+    tcpdump \
+    nmap
 
 COPY snmpd.conf /etc/snmp/snmpd.conf
 COPY entrypoint.sh /entrypoint.sh
+COPY index.html /var/lib/nginx/html/index.html
 
 RUN chmod +x /entrypoint.sh && \
     sed -i 's/\r$//' /entrypoint.sh /etc/snmp/snmpd.conf

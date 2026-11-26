@@ -6,6 +6,12 @@ if [ -w /proc/sys/net/ipv4/ip_forward ]; then
     sysctl -w net.ipv4.ip_forward=1 2>/dev/null || true
 fi
 
+# Se for o firewall, ativa regras de NAT/Redirecionamento para expor o servidor2 (DMZ) no host
+if [ "$(hostname)" = "firewall" ]; then
+    iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 172.28.2.10:8080 2>/dev/null || true
+    iptables -t nat -A POSTROUTING -j MASQUERADE 2>/dev/null || true
+fi
+
 # Se for servidor1, adiciona rota para a rede DMZ (172.28.2.0/24) via firewall (172.28.1.254)
 if [ "$(hostname)" = "servidor1" ]; then
     ip route add 172.28.2.0/24 via 172.28.1.254 2>/dev/null || true

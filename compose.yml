@@ -80,6 +80,8 @@ services:
   firewall:
     <<: *device
     hostname: firewall
+    ports:
+      - "${PORTA_PORTAL_WEB:-18088}:8080"
     networks:
       rede-gerencia:
         ipv4_address: 172.28.0.254

@@ -20,20 +20,25 @@ if (-not [string]::IsNullOrWhiteSpace("$ps")) {
 }
 $url = "http://127.0.0.1:$port"
 
-# 1. Remove flag de instalador web
-docker compose exec -T librenms sh -c "sed -i '/^INSTALL=/d' /opt/librenms/.env /data/.env 2>/dev/null" 2>$null
+# 1. Remove flag de instalador web e limpa cache
+docker compose exec -T librenms sh -c "sed -i '/^INSTALL=/d' /opt/librenms/.env /data/.env 2>/dev/null; rm -f /opt/librenms/bootstrap/cache/config.php; su -s /bin/bash librenms -c 'php /opt/librenms/artisan config:clear' 2>/dev/null" 2>$null
 
 # 2. Configura base_url
 Write-Host "Configurando base_url para $url..." -ForegroundColor Gray
 docker compose exec -T librenms lnms config:set base_url "$url" 2>$null
 
-# 3. Cria usuario admin
+# 3. Cria usuario admin com senha admin
 Write-Host "Criando usuario admin..." -ForegroundColor Gray
 docker compose exec -T librenms lnms user:add admin --password="GerenciaLab@2026!" --role=admin 2>$null
+$adminBcrypt = '$2y$12$RYBNrtYUz66JRO1GkS4UQOWjSxtb.HhF1zVa1dkudGSJgqHFA8LuC'
+"UPDATE users SET password = '$adminBcrypt' WHERE username = 'admin';" | docker compose exec -T db mariadb -u librenms -plab-db-local librenms 2>$null
 
 # 4. Prime o scheduler cache
 Write-Host "Inicializando agendador (Scheduler)..." -ForegroundColor Gray
 docker compose exec -T --user librenms librenms php /opt/librenms/artisan schedule:run 2>$null
+
+# Provisiona dashboard inicial
+Get-Content "$PSScriptRoot\nms\setup-dashboard.php" | docker compose exec -T --user librenms librenms php 2>$null
 
 # 5. Cadastra dispositivos
 Write-Host "Cadastrando dispositivos gerenciados..." -ForegroundColor Gray
@@ -46,4 +51,4 @@ Write-Host "Disparando descoberta inicial..." -ForegroundColor Gray
 docker compose exec -T -d --user librenms librenms php /opt/librenms/discovery.php -h all 2>$null
 
 Write-Host "`nConfiguracao concluida com sucesso!" -ForegroundColor Green
-Write-Host "Acesse: $url (admin / GerenciaLab@2026!)" -ForegroundColor Cyan
+Write-Host "Acesse: $url/login (admin / admin)" -ForegroundColor Cyan
