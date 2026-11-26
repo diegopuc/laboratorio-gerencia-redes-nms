@@ -4,7 +4,7 @@ Ambiente didático local com Docker Compose, LibreNMS, MariaDB, Redis, dispatche
 
 ## Iniciar
 
-Windows: execute `iniciar.bat`. Linux: `bash iniciar.sh`. A primeira execução requer Internet para baixar imagens e pacotes. Aguarde alguns minutos e abra http://localhost:8000. Caso apareça o instalador, finalize-o (banco `db`, usuário e banco `librenms`, senha `lab-db-local`). Crie um administrador. Execute `configurar.bat` ou `bash configurar.sh` para tentar cadastrar os dispositivos pela CLI. Se a versão da CLI divergir, use Devices > Add Device, hostname `servidor1`, `servidor2` e `firewall`, SNMP v2c, comunidade `laboratorio`, porta 161. As credenciais propostas são exclusivamente didáticas. Não exponha o ambiente na rede física.
+Windows: execute `iniciar.bat`. Linux: `bash iniciar.sh`. A primeira execução requer Internet para baixar imagens e pacotes. O script lista até dez portas TCP livres entre 18080 e 18180 e solicita uma porta (1024–65535). A escolha é validada e salva automaticamente em `.env`. Aguarde a resposta HTTP e acesse o endereço informado pelo script. No Linux, são necessários `ss` (iproute2) e `curl`. Caso apareça o instalador, finalize-o (banco `db`, usuário e banco `librenms`, senha `lab-db-local`). Crie um administrador. Execute `configurar.bat` ou `bash configurar.sh` para tentar cadastrar os dispositivos pela CLI. Se a versão da CLI divergir, use Devices > Add Device, hostname `servidor1`, `servidor2` e `firewall`, SNMP v2c, comunidade `laboratorio`, porta 161. As credenciais propostas são exclusivamente didáticas. Não exponha o ambiente na rede física.
 
 ## Operação
 
@@ -24,7 +24,7 @@ Consulte a pasta atividades. Aguarde pelo menos dois ciclos de polling (normalme
 - `docker compose exec librenms lnms device:add --help`
 - `docker compose exec librenms lnms user:add --help`
 - `docker compose exec servidor1 snmpwalk -v2c -c laboratorio servidor2 .1.3.6.1.2.1.1`
-- Se a porta 8000 estiver ocupada, altere somente a porta do host no compose e use o novo endereço no navegador.
+- Para trocar a porta, pare o laboratório (`docker compose down`) e execute novamente o script de início. Não apague os volumes. A verificação de portas é local e não reserva a porta até o Docker iniciar; se houver conflito nesse intervalo, execute novamente. Use Docker local, não um contexto remoto. Consulte a porta efetivamente publicada com `docker compose port librenms 8000`.
 - A imagem LibreNMS usa tag latest; após homologação, fixe a tag ou digest em `.env` com LIBRENMS_IMAGE para reproduzir a mesma versão.
 
 ## Referências
@@ -34,4 +34,4 @@ Consulte a pasta atividades. Aguarde pelo menos dois ciclos de polling (normalme
 
 ## Estado da validação
 
-Projeto revisado estaticamente; não executado em Docker durante sua criação. Homologue em um computador antes de distribuir. A criação automática de usuários/dispositivos depende da versão e do estado da instalação; o cadastro manual é o caminho alternativo.
+Projeto revisado estaticamente; a nova seleção de portas ainda não foi homologada em Docker ou Windows. Homologue em um computador antes de distribuir. A criação automática de usuários/dispositivos depende da versão e do estado da instalação; o cadastro manual é o caminho alternativo.

@@ -12,7 +12,7 @@ if "%op%"=="5" docker compose exec -T -d servidor1 iperf3 -c servidor2 -t 360 -b
 if "%op%"=="6" docker compose exec -T -d servidor1 stress-ng --cpu 1 --timeout 360s
 if "%op%"=="7" docker compose exec -T servidor2 tc qdisc replace dev eth0 root netem loss 10%%
 if "%op%"=="8" docker compose exec -T servidor2 tc qdisc del dev eth0 root
-if "%op%"=="9" start "" http://localhost:8000
+if "%op%"=="9" powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0abrir.ps1"
 if "%op%"=="10" docker compose down
 if "%op%"=="0" exit /b
  goto menu
