@@ -35,7 +35,7 @@ services:
   librenms:
     <<: *nms
     hostname: librenms
-    ports: ['127.0.0.1:8000:8000']
+    ports: ["127.0.0.1:${LIBRENMS_PORT:-18080}:8000"]
   dispatcher:
     <<: *nms
     hostname: dispatcher
