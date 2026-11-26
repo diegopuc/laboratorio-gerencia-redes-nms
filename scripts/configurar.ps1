@@ -1,3 +1,4 @@
+﻿$env:DOCKER_API_VERSION = '1.44'
 <#
 .SYNOPSIS
     Configuracao e provisionamento idempotente do LibreNMS

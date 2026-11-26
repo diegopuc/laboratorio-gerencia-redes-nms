@@ -1,4 +1,5 @@
 @echo off
+set DOCKER_API_VERSION=1.44
 title Monitor de Logs do Firewall em Tempo Real (Estilo pfSense Status/Logs)
 color 0A
 cls

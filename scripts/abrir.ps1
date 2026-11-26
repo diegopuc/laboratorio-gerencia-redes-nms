@@ -1,4 +1,5 @@
-﻿if (Test-Path variable:PSNativeCommandUseErrorActionPreference) {
+﻿$env:DOCKER_API_VERSION = '1.44'
+if (Test-Path variable:PSNativeCommandUseErrorActionPreference) {
     $PSNativeCommandUseErrorActionPreference = $false
 }
 $ErrorActionPreference = 'Continue'

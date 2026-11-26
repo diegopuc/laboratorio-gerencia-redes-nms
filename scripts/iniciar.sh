@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
+export DOCKER_API_VERSION='1.44'
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
