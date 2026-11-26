@@ -9,7 +9,6 @@ echo  Escutando todas as tentativas de conexao bloqueadas ou autorizadas...
 echo  (Pressione CTRL+C para fechar esta janela a qualquer momento)
 echo ====================================================================
 echo.
-
-cd /d "%~dp0"
+cd /d "%~dp0\.."
 docker compose exec firewall tcpdump -l -nn -i any "tcp dst port 8080"
 pause

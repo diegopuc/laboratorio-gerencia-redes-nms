@@ -2,7 +2,8 @@
 .SYNOPSIS
     Painel de Controle e Simulacoes do Laboratorio de Gerencia de Redes
 #>
-Set-Location $PSScriptRoot
+$RepoRoot = Split-Path $PSScriptRoot -Parent
+Set-Location $RepoRoot
 
 function Show-Header {
     Clear-Host
@@ -91,7 +92,7 @@ do {
             if ($conf -match '^[sS]') {
                 Write-Host "Destruindo ambiente e volumes..." -ForegroundColor Yellow
                 docker compose down -v --rmi local 2>$null
-                Remove-Item (Join-Path $PSScriptRoot '.env') -Force -ErrorAction SilentlyContinue
+                Remove-Item (Join-Path $RepoRoot '.env') -Force -ErrorAction SilentlyContinue
                 Write-Host "Ambiente restaurado ao estado inicial virgem. Use a opcao 1 para subir novamente." -ForegroundColor Green
             } else {
                 Write-Host "Operacao cancelada." -ForegroundColor Gray

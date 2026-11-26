@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 echo "================================================================"
 echo "    Laboratorio de Gerencia de Redes - LibreNMS e Docker        "
@@ -136,7 +136,7 @@ docker compose exec -T db mariadb -u librenms -plab-db-local librenms -e "UPDATE
 docker compose exec -T --user librenms librenms php /opt/librenms/artisan schedule:run >/dev/null 2>&1 || true
 
 # Provisiona dashboard inicial
-cat "$SCRIPT_DIR/nms/setup-dashboard.php" | docker compose exec -T --user librenms librenms php >/dev/null 2>&1 || true
+cat "$(pwd)/nms/setup-dashboard.php" | docker compose exec -T --user librenms librenms php >/dev/null 2>&1 || true
 
 # Cadastra dispositivos do laboratorio
 docker compose exec -T librenms lnms device:add firewall --v2c -c laboratorio >/dev/null 2>&1 || true

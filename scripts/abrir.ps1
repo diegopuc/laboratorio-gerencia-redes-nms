@@ -1,8 +1,9 @@
-if (Test-Path variable:PSNativeCommandUseErrorActionPreference) {
+﻿if (Test-Path variable:PSNativeCommandUseErrorActionPreference) {
     $PSNativeCommandUseErrorActionPreference = $false
 }
 $ErrorActionPreference = 'Continue'
-Set-Location $PSScriptRoot
+$RepoRoot = Split-Path $PSScriptRoot -Parent
+Set-Location $RepoRoot
 
 $ps = docker compose ps --status running -q librenms 2>$null
 if (-not [string]::IsNullOrWhiteSpace("$ps")) {

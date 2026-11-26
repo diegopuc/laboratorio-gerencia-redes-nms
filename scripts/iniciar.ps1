@@ -6,7 +6,8 @@ if (Test-Path variable:PSNativeCommandUseErrorActionPreference) {
     $PSNativeCommandUseErrorActionPreference = $false
 }
 $ErrorActionPreference = 'Continue'
-Set-Location $PSScriptRoot
+$RepoRoot = Split-Path $PSScriptRoot -Parent
+Set-Location $RepoRoot
 
 Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host "    Laboratorio de Gerencia de Redes - LibreNMS e Docker        " -ForegroundColor Cyan
@@ -54,7 +55,7 @@ $reset = Read-Host "Deseja limpar o ambiente e comecar do zero absoluto? (s/N) [
 if ($reset -match '^[sS]') {
     Write-Host "`nLimpando containers, volumes e imagens locais deste projeto..." -ForegroundColor Yellow
     docker compose down -v --rmi local 2>$null
-    Remove-Item (Join-Path $PSScriptRoot '.env') -Force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $RepoRoot '.env') -Force -ErrorAction SilentlyContinue
     Write-Host "Ambiente zerado com sucesso! Comecando do zero virgem.`n" -ForegroundColor Green
 } else {
     # 3. Se nao for zerar, verifica se ja esta rodando e pergunta se deseja reconfigurar
@@ -109,7 +110,7 @@ do {
 } until ($valid)
 
 # 5. Atualiza o arquivo .env
-$envFile = Join-Path $PSScriptRoot '.env'
+$envFile = Join-Path $RepoRoot '.env'
 $lines = @()
 if (Test-Path $envFile) {
     $lines = @(Get-Content $envFile | Where-Object { $_ -notmatch '^\s*(export\s+)?LIBRENMS_PORT\s*=' })
@@ -166,7 +167,7 @@ $adminBcrypt = '$2y$12$RYBNrtYUz66JRO1GkS4UQOWjSxtb.HhF1zVa1dkudGSJgqHFA8LuC'
 docker compose exec -T --user librenms librenms php /opt/librenms/artisan schedule:run 2>$null
 
 # Provisiona dashboard inicial rica, full-width e tempo real
-Get-Content "$PSScriptRoot\nms\setup-dashboard.php" | docker compose exec -T --user librenms librenms php 2>$null
+Get-Content "$RepoRoot\nms\setup-dashboard.php" | docker compose exec -T --user librenms librenms php 2>$null
 
 # Cadastra dispositivos do laboratorio
 docker compose exec -T librenms lnms device:add firewall --v2c -c laboratorio 2>$null
