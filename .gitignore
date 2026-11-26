@@ -3,6 +3,8 @@
 .env.*
 !.env.example
 
+.agents
+
 # Logs e arquivos temporarios
 *.log
 *.tmp
