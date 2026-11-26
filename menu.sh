@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
+export DOCKER_API_VERSION='1.44'
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -39,7 +40,7 @@ while true; do
     echo "   4. Parar containers do laboratorio (Preserva dados)"
     echo "   5. Restaurar ambiente ao estado inicial virgem (Apaga volumes do zero)"
     echo ""
-    echo -e "  SIMULAÇÕES NOC (DASHBOARD EM TEMPO REAL):"
+    echo -e "  SIMULAÃ‡Ã•ES NOC (DASHBOARD EM TEMPO REAL):"
     echo "   6. [AVAILABILITY MAP] Desligar servidor2 (Bloco 'servidor2' fica VERMELHO no mapa)"
     echo "   7. [AVAILABILITY MAP] Ligar servidor2 (Bloco 'servidor2' volta para VERDE no mapa)"
     echo "   8. [PORT SUMMARY] Desativar placa eth1 do servidor2 (Aumenta 'Down' em Ports)"
@@ -100,7 +101,7 @@ while true; do
             pause_menu
             ;;
         6)
-            echo -e "\n[AÇÃO] Desligando servidor2..."
+            echo -e "\n[AÃ‡ÃƒO] Desligando servidor2..."
             docker compose stop servidor2
             sql="UPDATE devices SET status = 0, status_reason = 'icmp,snmp' WHERE hostname = 'servidor2';
 DELETE FROM alert_faults WHERE rule_id = 1 AND device_id = 3;
@@ -111,11 +112,11 @@ UPDATE alerts SET state = 1, open = 1, alerted = 1, timestamp = NOW() WHERE rule
             log_lab_event "FALHA: Host servidor2 desligado manualmente (Mudou para DOWN no Availability Map)" "servidor2" 5
             echo "[OK] servidor2 desligado!"
             echo " -> Availability Map: bloco 'servidor2' fica VERMELHO."
-            echo " -> Alerts: alerta crítico 'Dispositivo Inacessivel / Fora do Ar' registrado."
+            echo " -> Alerts: alerta crÃ­tico 'Dispositivo Inacessivel / Fora do Ar' registrado."
             pause_menu
             ;;
         7)
-            echo -e "\n[AÇÃO] Ligando servidor2..."
+            echo -e "\n[AÃ‡ÃƒO] Ligando servidor2..."
             docker compose start servidor2
             sql="UPDATE devices SET status = 1, status_reason = '' WHERE hostname = 'servidor2';
 DELETE FROM alert_faults WHERE rule_id = 1 AND device_id = 3;
@@ -128,7 +129,7 @@ UPDATE alerts SET state = 0, open = 0, alerted = 0 WHERE rule_id = 1 AND device_
             pause_menu
             ;;
         8)
-            echo -e "\n[AÇÃO] Desativando interface eth1 de servidor2..."
+            echo -e "\n[AÃ‡ÃƒO] Desativando interface eth1 de servidor2..."
             docker compose exec -T servidor2 ip link set eth1 down 2>/dev/null || true
             sql="UPDATE ports SET ifOperStatus = 'down' WHERE device_id = 3 AND ifName = 'eth1';
 DELETE FROM alert_faults WHERE rule_id = 2 AND device_id = 3;
@@ -143,7 +144,7 @@ UPDATE alerts SET state = 1, open = 1, alerted = 1, timestamp = NOW() WHERE rule
             pause_menu
             ;;
         9)
-            echo -e "\n[AÇÃO] Reativando interface eth1 de servidor2..."
+            echo -e "\n[AÃ‡ÃƒO] Reativando interface eth1 de servidor2..."
             docker compose exec -T servidor2 ip link set eth1 up 2>/dev/null || true
             sql="UPDATE ports SET ifOperStatus = 'up' WHERE device_id = 3 AND ifName = 'eth1';
 DELETE FROM alert_faults WHERE rule_id = 2 AND device_id = 3;
@@ -156,7 +157,7 @@ UPDATE alerts SET state = 0, open = 0, alerted = 0 WHERE rule_id = 2 AND device_
             pause_menu
             ;;
         10)
-            echo -e "\n[AÇÃO] Injetando estresse maximo de CPU em servidor1 (100%)..."
+            echo -e "\n[AÃ‡ÃƒO] Injetando estresse maximo de CPU em servidor1 (100%)..."
             docker compose exec -T -d servidor1 stress-ng --cpu 2 --timeout 300s
             sql="DELETE FROM alert_faults WHERE rule_id = 3 AND device_id = 2;
 INSERT INTO alert_faults (rule_id, device_id, entity_type, entity_id, entity_key, state, alerted, open, severity, timestamp)
@@ -169,7 +170,7 @@ UPDATE alerts SET state = 1, open = 1, alerted = 1, timestamp = NOW() WHERE rule
             pause_menu
             ;;
         11)
-            echo -e "\n[AÇÃO] Interrompendo estresse de CPU em servidor1..."
+            echo -e "\n[AÃ‡ÃƒO] Interrompendo estresse de CPU em servidor1..."
             docker compose exec -T servidor1 pkill stress-ng 2>/dev/null || true
             sql="DELETE FROM alert_faults WHERE rule_id = 3 AND device_id = 2;
 UPDATE alerts SET state = 0, open = 0, alerted = 0 WHERE rule_id = 3 AND device_id = 2;"
@@ -180,7 +181,7 @@ UPDATE alerts SET state = 0, open = 0, alerted = 0 WHERE rule_id = 3 AND device_
             pause_menu
             ;;
         12)
-            echo -e "\n[AÇÃO] Injetando 25% de perda de pacotes no link do firewall..."
+            echo -e "\n[AÃ‡ÃƒO] Injetando 25% de perda de pacotes no link do firewall..."
             docker compose exec -T firewall tc qdisc replace dev eth1 root netem loss 25% 2>/dev/null || true
             sql="DELETE FROM alert_faults WHERE rule_id = 4 AND device_id = 1;
 INSERT INTO alert_faults (rule_id, device_id, entity_type, entity_id, entity_key, state, alerted, open, severity, timestamp)
@@ -193,7 +194,7 @@ UPDATE alerts SET state = 1, open = 1, alerted = 1, timestamp = NOW() WHERE rule
             pause_menu
             ;;
         13)
-            echo -e "\n[AÇÃO] Removendo perda de pacotes do link do firewall..."
+            echo -e "\n[AÃ‡ÃƒO] Removendo perda de pacotes do link do firewall..."
             docker compose exec -T firewall tc qdisc del dev eth1 root 2>/dev/null || true
             sql="DELETE FROM alert_faults WHERE rule_id = 4 AND device_id = 1;
 UPDATE alerts SET state = 0, open = 0, alerted = 0 WHERE rule_id = 4 AND device_id = 1;"
@@ -212,7 +213,7 @@ UPDATE alerts SET state = 0, open = 0, alerted = 0 WHERE rule_id = 4 AND device_
             pause_menu
             ;;
         15)
-            echo -e "\n[AÇÃO] Restaurando 100% das condicoes normais (Tudo Verde)..."
+            echo -e "\n[AÃ‡ÃƒO] Restaurando 100% das condicoes normais (Tudo Verde)..."
             docker compose start servidor2 2>/dev/null || true
             docker compose exec -T servidor1 pkill stress-ng 2>/dev/null || true
             docker compose exec -T servidor1 pkill iperf3 2>/dev/null || true

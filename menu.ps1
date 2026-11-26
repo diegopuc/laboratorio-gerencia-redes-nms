@@ -1,4 +1,5 @@
-﻿<#
+﻿$env:DOCKER_API_VERSION = '1.44'
+<#
 .SYNOPSIS
     Painel de Controle e Simulacoes do Laboratorio de Gerencia de Redes
 #>

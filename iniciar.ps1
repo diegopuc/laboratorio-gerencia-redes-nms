@@ -1,3 +1,4 @@
+﻿$env:DOCKER_API_VERSION = '1.44'
 <#
 .SYNOPSIS
     Inicializacao automatizada do Laboratorio de Gerencia de Redes com LibreNMS
